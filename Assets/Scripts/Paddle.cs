@@ -9,7 +9,7 @@ public class Paddle : MonoBehaviour
 
     [SerializeField] private float moveSpeed = 5f;
 
-    public event EventHandler onBallPush;
+    public event EventHandler onLaunchRequested;
 
     private void Awake()
     {
@@ -30,7 +30,7 @@ public class Paddle : MonoBehaviour
 
         if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            onBallPush?.Invoke(this, EventArgs.Empty);
+            onLaunchRequested?.Invoke(this, EventArgs.Empty);
         }
     }
 }
