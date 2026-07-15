@@ -4,11 +4,12 @@ public class Ball : MonoBehaviour
 {
 
     [SerializeField] private Transform paddle;
+    [SerializeField] private float maxBounceAngle = 75f;
 
     private Vector3 offset = new Vector3(0, 0.25f, 0);
     private Rigidbody2D ballRigidBody2D;
     private bool launched;
-    private float ballSpeed = 3f;
+    private float ballSpeed = 5f;
 
     private void Awake()
     {
@@ -28,12 +29,17 @@ public class Ball : MonoBehaviour
             transform.position = paddle.position + offset;
         }
 
-        Debug.Log(ballRigidBody2D.linearVelocity);
+        //Debug.Log(ballRigidBody2D.linearVelocity);
     }
 
     private void OnCollisionEnter2D(Collision2D collision2D)
     {
-        KeepConstantSpeed();
+        if (collision2D.gameObject.TryGetComponent(out Paddle paddle))
+        {
+            BounceFromPaddle(collision2D);
+        }
+
+            KeepConstantSpeed();
     }
 
     private void KeepConstantSpeed()
@@ -42,6 +48,23 @@ public class Ball : MonoBehaviour
         {
             ballRigidBody2D.linearVelocity = ballRigidBody2D.linearVelocity.normalized * ballSpeed;
         }
+    }
+
+    private void BounceFromPaddle(Collision2D collision2D)
+    {
+        Vector2 contactPoint = collision2D.GetContact(0).point;
+
+        float paddleWidth = collision2D.collider.bounds.size.x;
+
+        float paddleCenter = collision2D.collider.bounds.center.x;
+
+        float hitPosition = (contactPoint.x - paddleCenter) / (paddleWidth / 2);
+
+        float angle = hitPosition * maxBounceAngle;
+
+        Vector2 direction = Quaternion.Euler(0, 0, -angle) * Vector2.up;
+
+        ballRigidBody2D.linearVelocity = direction * ballSpeed;
     }
 
     private void Ball_onLaunchRequested(object sender, System.EventArgs e)
