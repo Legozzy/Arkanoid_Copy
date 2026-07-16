@@ -1,7 +1,10 @@
+using System;
 using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
+
+    public static Ball Instance { get; private set; }
 
     [SerializeField] private Transform paddle;
     [SerializeField] private float maxBounceAngle = 75f;
@@ -13,6 +16,8 @@ public class Ball : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
+
         ballRigidBody2D = GetComponent<Rigidbody2D>();
         ballRigidBody2D.simulated = false;
     }
@@ -28,8 +33,6 @@ public class Ball : MonoBehaviour
         {
             transform.position = paddle.position + offset;
         }
-
-        //Debug.Log(ballRigidBody2D.linearVelocity);
     }
 
     private void OnCollisionEnter2D(Collision2D collision2D)
@@ -37,9 +40,17 @@ public class Ball : MonoBehaviour
         if (collision2D.gameObject.TryGetComponent(out Paddle paddle))
         {
             BounceFromPaddle(collision2D);
+        } else if (collision2D.gameObject.TryGetComponent(out Brick brick))
+        {
+            brick.DestroySelf();
         }
+        
+        KeepConstantSpeed();
+    }
 
-            KeepConstantSpeed();
+    private void OnTriggerEnter2D(Collider2D collider2D)
+    {
+        
     }
 
     private void KeepConstantSpeed()
