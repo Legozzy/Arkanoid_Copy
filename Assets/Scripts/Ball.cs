@@ -14,6 +14,8 @@ public class Ball : MonoBehaviour
     private bool launched;
     private float ballSpeed = 5f;
 
+    public event EventHandler onBrickDestroy;
+
     private void Awake()
     {
         Instance = this;
@@ -42,7 +44,8 @@ public class Ball : MonoBehaviour
             BounceFromPaddle(collision2D);
         } else if (collision2D.gameObject.TryGetComponent(out Brick brick))
         {
-            brick.DestroySelf();
+            onBrickDestroy?.Invoke(this, EventArgs.Empty);
+            brick.TakeHit();
         }
         
         KeepConstantSpeed();
